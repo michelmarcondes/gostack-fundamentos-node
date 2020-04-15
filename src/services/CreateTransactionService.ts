@@ -1,6 +1,14 @@
 import TransactionsRepository from '../repositories/TransactionsRepository';
 import Transaction from '../models/Transaction';
 
+const TransactionType = ['income', 'outcome'];
+
+interface Request {
+  title: string;
+  value: number;
+  type: 'income' | 'outcome';
+}
+
 class CreateTransactionService {
   private transactionsRepository: TransactionsRepository;
 
@@ -8,8 +16,29 @@ class CreateTransactionService {
     this.transactionsRepository = transactionsRepository;
   }
 
-  public execute(): Transaction {
-    // TODO
+  public execute({ title, value, type }: Request): Transaction {
+    if (!title) {
+      throw Error('Title must be valid.');
+    }
+
+    if (!value) {
+      throw Error('Value must be valid.');
+    }
+
+    if (
+      !type ||
+      TransactionType.findIndex(transactiontype => transactiontype === type) < 0
+    ) {
+      throw Error("Type must be 'income' or 'outcome'.");
+    }
+
+    const transaction = this.transactionsRepository.create({
+      title,
+      value,
+      type,
+    });
+
+    return transaction;
   }
 }
 
